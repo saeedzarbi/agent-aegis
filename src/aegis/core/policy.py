@@ -69,7 +69,7 @@ class Policy(BaseModel):
                         "allowed_tools": [
                             "search_docs",
                             "send_email",
-                            "query_crm",
+                            "query_records",
                             "http_fetch",
                         ],
                         "tools": [

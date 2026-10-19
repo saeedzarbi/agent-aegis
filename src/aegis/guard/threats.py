@@ -5,7 +5,7 @@ from re import Pattern
 
 from aegis.core.models import ThreatLevel, ThreatSignal, ToolCallRequest
 
-# Heuristic patterns inspired by OWASP LLM Top 10 (tool misuse / injection).
+# Heuristic patterns for instruction override and tool misuse in user text.
 _INJECTION_PATTERNS: list[tuple[str, Pattern[str], ThreatLevel, str]] = [
     (
         "ignore_instructions",
