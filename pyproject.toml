@@ -9,7 +9,6 @@ description = "Policy guardrails and tamper-evident audit for tool-calling AI ag
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
-authors = [{ name = "Saeed Zarbi", email = "saeedzarbi95@gmail.com" }]
 keywords = ["ai-agents", "llm-security", "mcp", "prompt-injection", "guardrails"]
 classifiers = [
   "Development Status :: 3 - Alpha",
