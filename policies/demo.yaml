@@ -1,0 +1,20 @@
+version: 1
+default_tenant: default
+injection_block_level: medium
+tenants:
+  - tenant_id: default
+    allowed_tools:
+      - search_docs
+      - send_email
+      - query_crm
+      - http_fetch
+    tools:
+      - name: send_email
+        max_calls_per_session: 5
+        blocked_argument_keys:
+          - bcc
+          - attachments
+      - name: http_fetch
+        allowed_domains:
+          - api.github.com
+          - docs.python.org
