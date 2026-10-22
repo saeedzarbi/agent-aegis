@@ -1,5 +1,7 @@
 # Agent Aegis
 
+[![CI](https://github.com/saeedzarbi/agent-aegis/actions/workflows/ci.yml/badge.svg)](https://github.com/saeedzarbi/agent-aegis/actions/workflows/ci.yml)
+
 In-process Python 3.11 guard for tool-calling agents: check user input and tool calls before they hit your LLM or side-effecting tools.
 
 You keep the model and the tools. Aegis returns **allow**, **redact**, or **block**. It does not call external APIs on its own. Features: injection heuristics, YAML policy, tool allowlists, session rate limits, hash-chained JSONL audit, and optional Phase 1 **PII/PCI** mask/block (off by default).
