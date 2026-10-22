@@ -40,7 +40,22 @@
       font-size: 1.05rem;
       color: var(--muted);
       max-width: 22rem;
-      margin: 0 auto 2rem;
+      margin: 0 auto 1rem;
+      line-height: 1.4;
+    }
+    .blurb {
+      font-size: 0.9rem;
+      color: var(--text);
+      max-width: 32rem;
+      margin: 0 auto 1.75rem;
+      line-height: 1.5;
+      opacity: 0.92;
+    }
+    .section-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      max-width: 28rem;
+      margin: 0 auto 1rem;
       line-height: 1.4;
     }
     .hero-visual {
@@ -74,6 +89,18 @@
       animation: pulse-ring 2.5s ease-in-out infinite;
     }
     .flow .shield span { font-size: 1.5rem; }
+    .flow-steps {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.25rem 1.25rem;
+      margin-top: 0.75rem;
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .flow-steps span strong { color: var(--teal); font-weight: 600; text-transform: none; letter-spacing: 0; font-size: 0.7rem; }
     @keyframes nudge {
       0%, 100% { transform: translateX(0); opacity: 0.7; }
       50% { transform: translateX(4px); opacity: 1; }
@@ -151,7 +178,10 @@
     }
     .tile:hover { border-color: var(--teal-dim); transform: translateY(-2px); }
     .tile .e { font-size: 1.75rem; display: block; margin-bottom: 0.25rem; }
-    .tile .t { font-size: 0.75rem; color: var(--muted); }
+    .tile .t { font-size: 0.75rem; color: var(--text); font-weight: 600; display: block; }
+    .tile .c { font-size: 0.65rem; color: var(--muted); display: block; margin-top: 0.35rem; line-height: 1.35; padding: 0 0.25rem; }
+    .scene-note { font-size: 0.65rem; color: var(--muted); margin-top: 0.5rem; line-height: 1.3; }
+    .pill-hint { font-size: 0.75rem; color: var(--muted); margin: -1rem auto 1.5rem; max-width: 26rem; }
     .outcomes {
       display: flex;
       justify-content: center;
@@ -214,6 +244,7 @@
   <main class="page">
     <h1 class="logo">Agent <span>Aegis</span> 🛡️</h1>
     <p class="tag">Agents act. Data stays. ✨</p>
+    <p class="blurb">An in-process security guard for AI agents: it watches every message and tool call, allows, redacts, or blocks it, and helps keep sensitive data inside your environment—the library itself makes zero external calls.</p>
 
     <section class="hero-visual" aria-label="User to Aegis to AI to tools">
       <div class="flow">
@@ -226,21 +257,30 @@
         <span title="Tools">⚡</span>
       </div>
       <p class="hero-caption">Every message &amp; tool call — checked first</p>
+      <div class="flow-steps" aria-hidden="true">
+        <span><strong>User</strong> input</span>
+        <span><strong>Aegis</strong> gate</span>
+        <span><strong>Model</strong> plans</span>
+        <span><strong>Tools</strong> run</span>
+      </div>
     </section>
 
     <p class="tag" style="margin-bottom: 0.5rem;">😰 Leak fear stops AI.<br />🔒 Aegis unblocks it.</p>
+    <p class="section-hint">Without a checkpoint, agent context often flows to hosted models and third-party APIs. Aegis gives you a gate you run yourself.</p>
 
     <div class="fear-gif">
       <div class="scene bad">
         <div class="scene-icon">📤</div>
         <div class="scene-label">No guard</div>
         <div class="leak-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+        <p class="scene-note">Data drifts out</p>
       </div>
       <span class="mid-arrow">→</span>
       <div class="scene good">
         <div class="scene-icon"><span class="lock-spin">🛡️</span></div>
         <div class="scene-label">With Aegis</div>
         <div style="font-size:1.25rem;margin-top:0.35rem;">✅</div>
+        <p class="scene-note">Checked in your app</p>
       </div>
     </div>
 
@@ -249,6 +289,7 @@
       <span class="pill warn">redact</span>
       <span class="pill no">block</span>
     </div>
+    <p class="pill-hint">Three outcomes on every check—proceed, strip sensitive fields, or stop the action.</p>
 
     <div class="svg-band">
       <svg viewBox="0 0 520 72" role="img" aria-label="Animated scan through guard">
@@ -266,15 +307,17 @@
           </linearGradient>
         </defs>
       </svg>
+      <p class="section-hint" style="margin: 0.75rem auto 0;">Payloads pass through inspection before they reach the model or tools.</p>
     </div>
 
+    <p class="section-hint" style="margin-bottom: 0.75rem;">What you get in one library 👇</p>
     <div class="tiles">
-      <div class="tile"><span class="e">🏠</span><span class="t">In-process</span></div>
-      <div class="tile"><span class="e">📡</span><span class="t">Zero outbound</span></div>
-      <div class="tile"><span class="e">📋</span><span class="t">Your policy</span></div>
-      <div class="tile"><span class="e">🎭</span><span class="t">Mask PII</span></div>
-      <div class="tile"><span class="e">🔗</span><span class="t">Audit chain</span></div>
-      <div class="tile"><span class="e">🚫</span><span class="t">Tool limits</span></div>
+      <div class="tile"><span class="e">🏠</span><span class="t">In-process</span><span class="c">Runs inside your agent app—not a separate cloud service.</span></div>
+      <div class="tile"><span class="e">📡</span><span class="t">Zero outbound</span><span class="c">The guard does not call external APIs on its own.</span></div>
+      <div class="tile"><span class="e">📋</span><span class="t">Your policy</span><span class="c">YAML rules for tools, domains, and limits you control.</span></div>
+      <div class="tile"><span class="e">🎭</span><span class="t">Mask PII</span><span class="c">Optional detection; redact before prompts or tool args move on.</span></div>
+      <div class="tile"><span class="e">🔗</span><span class="t">Audit chain</span><span class="c">Hash-linked log of allow / redact / block on your disk.</span></div>
+      <div class="tile"><span class="e">🚫</span><span class="t">Tool limits</span><span class="c">Allowlists and rate caps so agents cannot sprawl.</span></div>
     </div>
 
     <p class="tag" style="font-size:0.9rem;">Real actions need real gates. 🚦</p>
