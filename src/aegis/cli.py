@@ -70,6 +70,8 @@ def verify_audit(
 def _print_decision(decision) -> None:
     color = {"allow": "green", "block": "red", "redact": "yellow"}.get(decision.verdict, "white")
     console.print(f"Verdict: [{color}]{decision.verdict}[/]")
+    if decision.sanitized_user_text is not None:
+        console.print(f"Sanitized user text: {decision.sanitized_user_text}")
     if decision.sanitized_arguments is not None:
         console.print(f"Sanitized args: {decision.sanitized_arguments}")
     if not decision.signals:
