@@ -13,6 +13,13 @@ from aegis.core.models import (
     ToolCallRequest,
 )
 from aegis.core.policy import Policy
+from aegis.guard.sensitive.engine import (
+    mask_structure_from_matches,
+    mask_text,
+    matches_to_signals,
+    scan_structure,
+    scan_text,
+)
 from aegis.guard.threats import scan_tool_arguments, scan_user_text
 
 _LEVEL_ORDER = {
@@ -40,8 +47,14 @@ class GuardPipeline:
 
     def inspect_user_input(self, session_id: str, tenant_id: str, text: str) -> GuardDecision:
         signals = scan_user_text(text)
+        sanitized_user_text: str | None = None
+        signals, sanitized_user_text = self._apply_sensitive_user_input(text, signals)
         verdict = self._verdict_from_signals(signals)
-        decision = GuardDecision(verdict=verdict, signals=signals)
+        decision = GuardDecision(
+            verdict=verdict,
+            signals=signals,
+            sanitized_user_text=sanitized_user_text,
+        )
         self.audit.append(
             AuditEventType.USER_INPUT,
             session_id,
@@ -70,6 +83,7 @@ class GuardPipeline:
 
         spec = self.policy.tool_spec(request.tenant_id, request.tool_name)
         sanitized = dict(request.arguments)
+        signals, sanitized = self._apply_sensitive_tool_arguments(sanitized, signals)
         if spec:
             for key in spec.blocked_argument_keys:
                 if key in sanitized:
@@ -140,3 +154,67 @@ class GuardPipeline:
         if max_level >= self._block_from:
             return GuardVerdict.BLOCK
         return GuardVerdict.ALLOW
+
+    def _apply_sensitive_user_input(
+        self,
+        text: str,
+        signals: list,
+    ) -> tuple[list, str | None]:
+        cfg = self.policy.sensitive_data
+        if not cfg.enabled or not cfg.scan_user_input:
+            return signals, None
+        matches = scan_text(text)
+        if not matches:
+            return signals, None
+        if cfg.mode == "mask":
+            from aegis.core.models import ThreatLevel, ThreatSignal
+
+            signals.append(
+                ThreatSignal(
+                    rule_id="sensitive_masked",
+                    level=ThreatLevel.LOW,
+                    message="Sensitive values masked in user text",
+                )
+            )
+            return signals, mask_text(text, matches)
+        signals.extend(matches_to_signals(text, matches))
+        return signals, None
+
+    def _apply_sensitive_tool_arguments(
+        self,
+        arguments: dict,
+        signals: list,
+    ) -> tuple[list, dict]:
+        cfg = self.policy.sensitive_data
+        if not cfg.enabled or not cfg.scan_tool_arguments:
+            return signals, arguments
+        matches = scan_structure(arguments)
+        if not matches:
+            return signals, arguments
+        if cfg.mode == "mask":
+            from aegis.core.models import ThreatLevel, ThreatSignal
+
+            signals.append(
+                ThreatSignal(
+                    rule_id="sensitive_masked",
+                    level=ThreatLevel.LOW,
+                    message="Sensitive values masked in tool arguments",
+                )
+            )
+            return signals, mask_structure_from_matches(arguments)
+        signals.extend(_signals_from_structure(arguments))
+        return signals, arguments
+
+
+def _signals_from_structure(node) -> list[ThreatSignal]:
+    out: list[ThreatSignal] = []
+    if isinstance(node, str):
+        ms = scan_text(node)
+        out.extend(matches_to_signals(node, ms))
+    elif isinstance(node, dict):
+        for v in node.values():
+            out.extend(_signals_from_structure(v))
+    elif isinstance(node, list):
+        for item in node:
+            out.extend(_signals_from_structure(item))
+    return out

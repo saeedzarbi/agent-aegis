@@ -1,6 +1,8 @@
 # Agent Aegis
 
-**Policy-native guardrails for tool-calling AI agents** — block prompt injection, enforce tool allowlists, rate-limit risky actions, and keep a **tamper-evident audit trail** before tools run against email, HTTP endpoints, or other side effects.
+**Policy-native guardrails for tool-calling AI agents** — block prompt injection, enforce tool allowlists, rate-limit risky actions, detect or mask sensitive data before external egress, and keep a **tamper-evident audit trail** before tools run against email, HTTP endpoints, or other side effects.
+
+This repository **is** the project: the repo root contains the `agent-aegis` Python package, policies, tests, and docs. See [docs/project-layout.md](docs/project-layout.md).
 
 Agents are moving from chat to **action** (MCP, function calling, browser tools). The failure mode is no longer a wrong paragraph — it is an unintended tool call, a leaked credential, or data sent to the wrong destination. Agent Aegis sits in the **execution path**: every user turn and every tool call is scored against YAML policy, with hash-chained logs for later review.
 
@@ -29,7 +31,20 @@ aegis check-tool send_email --args '{"to":"you@co.com","bcc":"x@evil.com"}' --us
 python examples/mini_agent.py
 
 pytest -q
+pytest -q --cov=aegis --cov-report=term-missing
 ```
+
+## Sensitive data (Phase 1)
+
+Opt-in PII/PCI scanning for user text and tool arguments (`sensitive_data` in policy). See [docs/sanitization-phase1-problem.md](docs/sanitization-phase1-problem.md).
+
+```yaml
+sensitive_data:
+  enabled: true
+  mode: block   # or mask
+```
+
+Use `decision.sanitized_user_text` and `decision.sanitized_arguments` before calling external LLMs or APIs.
 
 ## Policy as code
 

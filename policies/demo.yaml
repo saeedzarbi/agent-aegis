@@ -1,6 +1,12 @@
 version: 1
 default_tenant: default
 injection_block_level: medium
+# Opt-in PII/PCI scan before external LLM/API egress (see docs/sanitization-phase1-problem.md)
+sensitive_data:
+  enabled: false
+  mode: block # block | mask
+  scan_user_input: true
+  scan_tool_arguments: true
 tenants:
   - tenant_id: default
     allowed_tools:

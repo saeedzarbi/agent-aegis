@@ -15,6 +15,15 @@ class ToolPolicy(BaseModel):
     allowed_domains: list[str] = Field(default_factory=list)
 
 
+class SensitiveDataPolicy(BaseModel):
+    """PII/PCI detection before data reaches external LLMs or APIs."""
+
+    enabled: bool = False
+    mode: str = "block"  # block | mask
+    scan_user_input: bool = True
+    scan_tool_arguments: bool = True
+
+
 class TenantPolicy(BaseModel):
     tenant_id: str
     allowed_tools: list[str] = Field(default_factory=list)
@@ -28,6 +37,7 @@ class Policy(BaseModel):
     version: int = 1
     default_tenant: str = "default"
     injection_block_level: str = "medium"
+    sensitive_data: SensitiveDataPolicy = Field(default_factory=SensitiveDataPolicy)
     tenants: list[TenantPolicy] = Field(default_factory=list)
 
     def tenant(self, tenant_id: str) -> TenantPolicy:
